@@ -14,6 +14,8 @@ class Matrix {
         Matrix(size_t x, size_t y, size_t z = 1);
 
         Shape getShape() const;
+        T& at(size_t x, size_t y, size_t z);
+        const T& at(size_t x, size_t y, size_t z) const;
 
         T& operator[](const int index);
         const T& operator[](const int index) const;
@@ -43,4 +45,14 @@ T& Matrix<T>::operator[](const int index) {
 template <typename T>
 const T& Matrix<T>::operator[](const int index) const {
     return data.at(index);
+}
+
+template <typename T>
+T& Matrix<T>::at(size_t x, size_t y, size_t z) {
+    return data.at(shape.x * shape.y * z + shape.x * y + x);
+}
+
+template <typename T>
+const T& Matrix<T>::at(size_t x, size_t y, size_t z) const {
+    return data.at(shape.x * shape.y * z + shape.x * y + x);
 }
