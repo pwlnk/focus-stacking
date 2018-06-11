@@ -27,11 +27,11 @@ unsigned short GaussianKernel::getSize() {
     return ksize;
 }
 
-float GaussianKernel::at(size_t col, size_t row) {
+float GaussianKernel::at(int col, int row) {
     return kernel_values.at(row * ksize + col);
 }
 
-float GaussianKernel::at1D(size_t idx) {
+float GaussianKernel::at1D(int idx) {
     return kernel_values_1D.at(idx);
 }
 

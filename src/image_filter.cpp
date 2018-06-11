@@ -48,6 +48,7 @@ void ImageFilter::convolution2D(Matrix<uint8_t>& image, Matrix<uint8_t>& filtere
 }
 
 void ImageFilter::convolution1D(Matrix<uint8_t>& image, Matrix<uint8_t>& filtered_image) {
+    Matrix<uint8_t> after_first_pass_image(image.getShape());
     Matrix<uint8_t>* sampled_image = &image;
 
     for (int kernel_direction = 0; kernel_direction < 2; kernel_direction++) {
@@ -70,9 +71,13 @@ void ImageFilter::convolution1D(Matrix<uint8_t>& image, Matrix<uint8_t>& filtere
                     }
                     filtered_image.at(col, row, channel) = convolution_step_value;
 
+                    // TODO: magic number
+                    if (kernel_direction == 0) {
+                        after_first_pass_image.at(col, row, channel) = convolution_step_value;
+                    }
                 }
             }
         }
-        sampled_image = &filtered_image;
+        sampled_image = &after_first_pass_image;
     }
 }

@@ -15,7 +15,7 @@ class GaussianKernel : public FilterKernel {
 
         std::vector<float> getValues();
         unsigned short getSize();
-        float at(size_t col, size_t row);
-        float at1D(size_t idx);
+        float at(int col, int row);
+        float at1D(int idx);
         bool isSeparableInto1D();
 };
