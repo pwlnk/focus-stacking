@@ -19,9 +19,9 @@ class ImageFilterTest : public ::testing::Test {
     protected:
         Matrix<uint8_t> image;
         Matrix<uint8_t> expected_image;
-        
+
         void populateExpectedImage();
-    
+
         ImageFilterTest() :
         image(4, 4, 3), expected_image(4, 4, 3)
         {
@@ -35,7 +35,7 @@ class ImageFilterTest : public ::testing::Test {
 TEST_F(ImageFilterTest, ShouldPerform1DConvolutionIfPossible) {
     // given
     MockFilterKernel mock_kernel;
-    ImageFilter image_filter(mock_kernel);    
+    ImageFilter<uint8_t, uint8_t> image_filter(mock_kernel);
 
     EXPECT_CALL(mock_kernel, getSize())
             .WillRepeatedly(Return(3));
@@ -47,7 +47,7 @@ TEST_F(ImageFilterTest, ShouldPerform1DConvolutionIfPossible) {
     // when
     Matrix<uint8_t> filtered_image = image_filter.convolution(image);
     Shape image_shape = image.getShape();
-    
+
     // then
     ASSERT_EQ(filtered_image.getShape(), image_shape);
     for (int row = 0; row < image_shape.y; row++) {
@@ -62,7 +62,7 @@ TEST_F(ImageFilterTest, ShouldPerform1DConvolutionIfPossible) {
 TEST_F(ImageFilterTest, ShouldPerform2DConvolutionIf1DImpossible) {
     // given
     MockFilterKernel mock_kernel;
-    ImageFilter image_filter(mock_kernel);
+    ImageFilter<uint8_t, uint8_t> image_filter(mock_kernel);
 
     EXPECT_CALL(mock_kernel, getSize())
             .WillRepeatedly(Return(3));

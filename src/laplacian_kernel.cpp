@@ -1,9 +1,26 @@
 #include "laplacian_kernel.h"
 
 LaplacianKernel::LaplacianKernel() :
-ksize(3)
+ksize(7)
 {
-    kernel_values = {0, 1, 0, 1, -4, 1, 0, 1, 0};
+    kernel_values = {
+            1, 1, 1,   1, 1, 1, 1,
+            1, 1, 1,   1, 1, 1, 1,
+            1, 1, 1,   1, 1, 1, 1,
+            1, 1, 1, -48, 1, 1, 1,
+            1, 1, 1,   1, 1, 1, 1,
+            1, 1, 1,   1, 1, 1, 1,
+            1, 1, 1,   1, 1, 1, 1,
+            1, 1, 1,   1, 1, 1, 1,};
+
+//    kernel_values = {
+//            1, 4, 1,
+//            4, -20, 4,
+//            1, 4, 1};
+//
+//    for (auto& val : kernel_values) {
+//        val /= 6.0f;
+//    }
 }
 
 LaplacianKernel::~LaplacianKernel()
