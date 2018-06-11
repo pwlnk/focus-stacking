@@ -5,6 +5,8 @@
 
 #include "src/matrix.h"
 #include "src/grayscale_converter.h"
+#include "src/image_filter.h"
+#include "src/gaussian_kernel.h"
 
 // TODO: extract to separate utils class
 Matrix<uint8_t> cvMat2Matrix(cv::Mat& opencv_matrix);
@@ -34,9 +36,12 @@ int main(int argc, char* argv[]) {
         images.push_back(cvMat2Matrix(image));
     }
 
-    Matrix<uint8_t> grayscale_image = GrayscaleConverter::convertToGrayscale(images[0]);
+    Matrix<uint8_t> grayscale_image = GrayscaleConverter::convertToGrayscale(images[13]);
 
-    cv::Mat image = matrix2CvMat(grayscale_image);
+    GaussianKernel gaussian_kernel;
+    Matrix<uint8_t> blurred_image = ImageFilter::convolution(images[13], gaussian_kernel);
+
+    cv::Mat image = matrix2CvMat(blurred_image);
     cv::namedWindow("Image", cv::WINDOW_AUTOSIZE);
     cv::imshow("Image", image);
     cv::waitKey(0);

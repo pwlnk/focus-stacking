@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iostream>
+#include <stdint.h>
 #include "matrix.h"
 
 class GrayscaleConverter {
