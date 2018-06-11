@@ -3,6 +3,9 @@
 #include <vector>
 #include <algorithm>
 
+#include <cstdio>
+#include <ctime>
+
 #include "src/matrix.h"
 #include "src/grayscale_converter.h"
 #include "src/image_filter.h"
@@ -39,7 +42,15 @@ int main(int argc, char* argv[]) {
     Matrix<uint8_t> grayscale_image = GrayscaleConverter::convertToGrayscale(images[13]);
 
     GaussianKernel gaussian_kernel;
+
+    std::clock_t start;
+    double duration;
+    start = std::clock();
+
     Matrix<uint8_t> blurred_image = ImageFilter::convolution(images[13], gaussian_kernel);
+
+    duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
+    std::cout << "time: " << duration << std::endl;
 
     cv::Mat image = matrix2CvMat(blurred_image);
     cv::namedWindow("Image", cv::WINDOW_AUTOSIZE);

@@ -4,16 +4,22 @@
 ImageFilter::ImageFilter()
 { }
 
-short ImageFilter::getSamePaddingValue(short kernel_size) {
-    return (kernel_size - 1) / 2;
-}
-
 // TODO: result matrix cannot be uint (negative values possible)
 Matrix<uint8_t> ImageFilter::convolution(Matrix<uint8_t>& image, FilterKernel& kernel) {
     Shape result_image_shape = image.getShape();
     Matrix<uint8_t> filtered_image(result_image_shape);
 
-    short padding = getSamePaddingValue(kernel.getSize());
+    if (kernel.isSeparableInto1D()) {
+        convolution1D(image, filtered_image, kernel);
+    }
+    else {
+        convolution2D(image, filtered_image, kernel);
+    }
+
+    return filtered_image;
+}
+
+void ImageFilter::convolution2D(Matrix<uint8_t>& image, Matrix<uint8_t>& filtered_image, FilterKernel& kernel) {
     for (int col = 0; col < image.getShape().x; col++) {
         for (int row = 0; row < image.getShape().y; row++) {
             for (int channel = 0; channel < image.getShape().z; channel++) {
@@ -38,6 +44,34 @@ Matrix<uint8_t> ImageFilter::convolution(Matrix<uint8_t>& image, FilterKernel& k
             }
         }
     }
+}
 
-    return filtered_image;
+void ImageFilter::convolution1D(Matrix<uint8_t>& image, Matrix<uint8_t>& filtered_image, FilterKernel& kernel) {
+    Matrix<uint8_t>* sampled_image = &image;
+
+    for (int kernel_direction = 0; kernel_direction < 2; kernel_direction++) {
+        for (int row = 0; row < image.getShape().y; row++) {
+            for (int col = 0; col < image.getShape().x; col++) {
+                for (int channel = 0; channel < image.getShape().z; channel++) {
+
+                    float convolution_step_value = 0;
+                    for (int kernel_idx = 0; kernel_idx < kernel.getSize(); kernel_idx++) {
+                        int image_col_idx = kernel_direction == 0 ? col - (kernel.getSize() - 1) / 2 + kernel_idx : col;
+                        int image_row_idx = kernel_direction == 1 ? row - (kernel.getSize() - 1) / 2 + kernel_idx : row;
+
+                        uint8_t image_value = 0;
+                        if (image_col_idx >= 0 && image_col_idx < image.getShape().x &&
+                            image_row_idx >= 0 && image_row_idx < image.getShape().y) {
+                            image_value = sampled_image->at(image_col_idx, image_row_idx, channel);
+                        }
+
+                        convolution_step_value += kernel.at1D(kernel_idx) * image_value;
+                    }
+                    filtered_image.at(col, row, channel) = convolution_step_value;
+
+                }
+            }
+        }
+        sampled_image = &filtered_image;
+    }
 }
