@@ -10,6 +10,7 @@
 #include "src/grayscale_converter.h"
 #include "src/image_filter.h"
 #include "src/gaussian_kernel.h"
+#include "src/laplacian_kernel.h"
 
 // TODO: extract to separate utils class
 Matrix<uint8_t> cvMat2Matrix(cv::Mat& opencv_matrix);
@@ -47,12 +48,21 @@ int main(int argc, char* argv[]) {
 
     GaussianKernel gaussian_kernel;
     ImageFilter gaussian_filter(gaussian_kernel);
-    Matrix<uint8_t> blurred_image = gaussian_filter.convolution(images[13]);
+    Matrix<uint8_t> blurred_image = gaussian_filter.convolution(grayscale_image);
 
     duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
-    std::cout << "time: " << duration << std::endl;
+    std::cout << "gaussian time: " << duration << std::endl;
 
-    cv::Mat image = matrix2CvMat(blurred_image);
+    start = std::clock();
+
+    LaplacianKernel laplacian_kernel;
+    ImageFilter laplacian_filter(laplacian_kernel);
+    Matrix<uint8_t> laplacian = laplacian_filter.convolution(blurred_image);
+
+    duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
+    std::cout << "laplacian time: " << duration << std::endl;
+
+    cv::Mat image = matrix2CvMat(laplacian);
     cv::namedWindow("Image", cv::WINDOW_AUTOSIZE);
     cv::imshow("Image", image);
     cv::waitKey(0);
