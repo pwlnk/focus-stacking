@@ -41,13 +41,13 @@ int main(int argc, char* argv[]) {
 
     Matrix<uint8_t> grayscale_image = GrayscaleConverter::convertToGrayscale(images[13]);
 
-    GaussianKernel gaussian_kernel;
-
     std::clock_t start;
     double duration;
     start = std::clock();
 
-    Matrix<uint8_t> blurred_image = ImageFilter::convolution(images[13], gaussian_kernel);
+    GaussianKernel gaussian_kernel;
+    ImageFilter gaussian_filter(gaussian_kernel);
+    Matrix<uint8_t> blurred_image = gaussian_filter.convolution(images[13]);
 
     duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
     std::cout << "time: " << duration << std::endl;

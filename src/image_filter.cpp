@@ -1,25 +1,26 @@
 #include <iostream>
 #include "image_filter.h"
 
-ImageFilter::ImageFilter()
+ImageFilter::ImageFilter(FilterKernel& kernel) :
+kernel(kernel)
 { }
 
 // TODO: result matrix cannot be uint (negative values possible)
-Matrix<uint8_t> ImageFilter::convolution(Matrix<uint8_t>& image, FilterKernel& kernel) {
+Matrix<uint8_t> ImageFilter::convolution(Matrix<uint8_t>& image) {
     Shape result_image_shape = image.getShape();
     Matrix<uint8_t> filtered_image(result_image_shape);
 
     if (kernel.isSeparableInto1D()) {
-        convolution1D(image, filtered_image, kernel);
+        convolution1D(image, filtered_image);
     }
     else {
-        convolution2D(image, filtered_image, kernel);
+        convolution2D(image, filtered_image);
     }
 
     return filtered_image;
 }
 
-void ImageFilter::convolution2D(Matrix<uint8_t>& image, Matrix<uint8_t>& filtered_image, FilterKernel& kernel) {
+void ImageFilter::convolution2D(Matrix<uint8_t>& image, Matrix<uint8_t>& filtered_image) {
     for (int col = 0; col < image.getShape().x; col++) {
         for (int row = 0; row < image.getShape().y; row++) {
             for (int channel = 0; channel < image.getShape().z; channel++) {
@@ -46,7 +47,7 @@ void ImageFilter::convolution2D(Matrix<uint8_t>& image, Matrix<uint8_t>& filtere
     }
 }
 
-void ImageFilter::convolution1D(Matrix<uint8_t>& image, Matrix<uint8_t>& filtered_image, FilterKernel& kernel) {
+void ImageFilter::convolution1D(Matrix<uint8_t>& image, Matrix<uint8_t>& filtered_image) {
     Matrix<uint8_t>* sampled_image = &image;
 
     for (int kernel_direction = 0; kernel_direction < 2; kernel_direction++) {
