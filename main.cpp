@@ -4,11 +4,12 @@
 #include <algorithm>
 
 #include "src/matrix.h"
+#include "src/grayscale_converter.h"
 
 // TODO: extract to separate utils class
 Matrix<uint8_t> cvMat2Matrix(cv::Mat& opencv_matrix);
 cv::Mat matrix2CvMat(Matrix<uint8_t>& matrix);
-size_t channelBGR2RGB(size_t BGR_channel, size_t channels_num);
+short channelBGR2RGB(short BGR_channel, short channels_num);
 
 int main(int argc, char* argv[]) {
 
@@ -32,6 +33,14 @@ int main(int argc, char* argv[]) {
         std::cout << "reading image: " << filename << std::endl;
         images.push_back(cvMat2Matrix(image));
     }
+
+    Matrix<uint8_t> grayscale_image = GrayscaleConverter::convertToGrayscale(images[0]);
+
+    cv::Mat image = matrix2CvMat(grayscale_image);
+    cv::namedWindow("Image", cv::WINDOW_AUTOSIZE);
+    cv::imshow("Image", image);
+    cv::waitKey(0);
+
 
     return 0;
 }
@@ -80,6 +89,6 @@ cv::Mat matrix2CvMat(Matrix<uint8_t>& matrix) {
     return opencv_matrix;
 }
 
-size_t channelBGR2RGB(size_t BGR_channel, size_t channels_num) {
+short channelBGR2RGB(short BGR_channel, short channels_num) {
     return channels_num - BGR_channel - 1;
 }

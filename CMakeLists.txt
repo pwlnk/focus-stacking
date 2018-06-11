@@ -13,7 +13,7 @@ enable_testing()
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 file(GLOB SOURCES "src/.h" "src/*.cpp")
-file(GLOB TEST_SOURCES "tests/*.cpp")
+file(GLOB TEST_SOURCES "test/.h" "test/*.cpp")
 
 add_executable(focusStacking main.cpp ${SOURCES})
 add_executable(runAllTests tests.cpp ${TEST_SOURCES} ${SOURCES})
