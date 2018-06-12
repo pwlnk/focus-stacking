@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <stdint.h>
 
 #include "src/images_utils.h"
 #include "src/focus_stack.h"
