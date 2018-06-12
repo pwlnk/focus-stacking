@@ -19,7 +19,7 @@ add_executable(focusStacking main.cpp ${SOURCES})
 add_executable(runAllTests tests.cpp ${TEST_SOURCES} ${SOURCES})
 
 target_link_libraries(focusStacking ${OpenCV_LIBS})
-target_link_libraries(runAllTests gtest gtest_main gmock gmock_main)
+target_link_libraries(runAllTests ${OpenCV_LIBS} gtest gtest_main gmock gmock_main)
 
 add_test(AllTests runAllTests)
 

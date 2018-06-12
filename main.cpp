@@ -1,120 +1,44 @@
 #include <iostream>
-#include <opencv2/opencv.hpp>
-#include <vector>
-#include <algorithm>
-#include <cmath>
 
-#include <cstdio>
-#include <ctime>
-
-#include "src/matrix.h"
-#include "src/grayscale_converter.h"
-#include "src/image_filter.h"
-#include "src/gaussian_kernel.h"
-#include "src/laplacian_kernel.h"
-
+#include "src/images_utils.h"
 #include "src/focus_stack.h"
 
-#include <algorithm>
-#include <functional>
-
-// TODO: extract to separate utils class
-Matrix<uint8_t> cvMat2Matrix(cv::Mat& opencv_matrix);
-cv::Mat matrix2CvMat(Matrix<uint8_t>& matrix);
-short channelBGR2RGB(short BGR_channel, short channels_num);
+std::string getImagesDir(int argc, char* argv[], std::string default_images_dir);
 
 int main(int argc, char* argv[]) {
 
-    const char* DEFAULT_IMG_DIR = "input/";
-    const char* img_dir;
+    std::string images_dir = getImagesDir(argc, argv, "input/");
 
-    if (argc == 2) {
-        img_dir = argv[1];
-    } else {
-        img_dir = DEFAULT_IMG_DIR;
-    }
-
-    std::vector<cv::String> filenames;
-    cv::glob(cv::String(img_dir), filenames);
-    std::sort(filenames.begin(), filenames.end());
-
-    FocusStack focusStack;
-    for (auto filename : filenames) {
-        cv::Mat image = cv::imread(filename, CV_LOAD_IMAGE_COLOR);
-        std::cout << "reading image: " << filename << std::endl;
-        focusStack.addImage(cvMat2Matrix(image));
-    }
+    FocusStack focus_stack;
+    images_utils::readImagesFromDirToFocusStack(images_dir, focus_stack);
 
     std::clock_t start;
     double duration;
     start = std::clock();
 
-    focusStack.computeAllInFocusAndDepthMap();
-    Matrix<uint8_t> depth_map = focusStack.getDepthMap();
-    Matrix<uint8_t> all_in_focus_image = focusStack.getAllInFocusImage();
+    focus_stack.computeAllInFocusAndDepthMap();
 
     duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
     std::cout << "processing time: " << duration << std::endl;
 
-    cv::Mat image = matrix2CvMat(depth_map);
-    cv::namedWindow("Image", cv::WINDOW_AUTOSIZE);
-    cv::imshow("Image", image);
-    cv::imwrite("../../depth_map.jpg", image);
+    Matrix<uint8_t> depth_map = focus_stack.getDepthMap();
+    Matrix<uint8_t> all_in_focus_image = focus_stack.getAllInFocusImage();
+    
+    images_utils::showImage("Depth Map", depth_map);
+    images_utils::showImage("All in Focus Image", all_in_focus_image);
 
-    cv::Mat focus_image = matrix2CvMat(all_in_focus_image);
-    cv::namedWindow("Focus Image", cv::WINDOW_AUTOSIZE);
-    cv::imshow("Focus Image", focus_image);
-    cv::imwrite("../../focus_image.jpg", focus_image);
+    images_utils::storeImageOnDisk("../../depth_map.jpg", depth_map);
+    images_utils::storeImageOnDisk("../../focus_image.jpg", all_in_focus_image);
 
     cv::waitKey(0);
 
     return 0;
 }
 
-Matrix<uint8_t> cvMat2Matrix(cv::Mat& opencv_matrix) {
-    Shape shape(opencv_matrix.cols, opencv_matrix.rows, opencv_matrix.channels());
-    Matrix<uint8_t> matrix(shape);
-
-    int channels = opencv_matrix.channels();
-
-    for (size_t row = 0; row < matrix.getShape().y; row++) {
-        uint8_t* opencv_matrix_row_pointer = opencv_matrix.ptr(row);
-        for (size_t col = 0; col < matrix.getShape().x; col++) {
-            for (size_t channel = 0; channel < channels; channel++) {
-                matrix.at(col, row, channelBGR2RGB(channel, channels)) = opencv_matrix_row_pointer[col * channels + channel];
-            }
-        }
+std::string getImagesDir(int argc, char* argv[], std::string default_images_dir) {
+    if (argc == 2) { 
+        return std::string(argv[1]);
     }
-
-    return matrix;
-}
-
-cv::Mat matrix2CvMat(Matrix<uint8_t>& matrix) {
-    int channels = matrix.getShape().z;
-    cv::Mat opencv_matrix;
-
-    switch (channels) {
-        case 1 :
-            opencv_matrix = cv::Mat(matrix.getShape().y, matrix.getShape().x, CV_8UC1);
-            break;
-        case 3 :
-            opencv_matrix = cv::Mat(matrix.getShape().y, matrix.getShape().x, CV_8UC3);
-            break;
-    }
-
-
-    for (size_t row = 0; row < matrix.getShape().y; row++) {
-        uint8_t* opencv_matrix_row_pointer = opencv_matrix.ptr(row);
-        for (size_t col = 0; col < matrix.getShape().x; col++) {
-            for (size_t channel = 0; channel < channels; channel++) {
-                opencv_matrix_row_pointer[col * channels + channel] = matrix.at(col, row, channelBGR2RGB(channel, channels));
-            }
-        }
-    }
-
-    return opencv_matrix;
-}
-
-short channelBGR2RGB(short BGR_channel, short channels_num) {
-    return channels_num - BGR_channel - 1;
+    
+    return default_images_dir;
 }
