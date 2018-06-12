@@ -6,6 +6,7 @@
 #include "filter_kernel.h"
 #include "convolution_strategy.h"
 #include "serial_convolution_strategy.h"
+#include "parallel_convolution_strategy.h"
 
 template <typename TInput, typename TOutput>
 class ImageFilter {
@@ -23,7 +24,8 @@ template <typename TInput, typename TOutput>
 ImageFilter<TInput, TOutput>::ImageFilter(FilterKernel& kernel) :
 kernel(kernel)
 {
-    convolution_strategy = new SerialConvolutionStrategy<TInput, TOutput>();
+//    convolution_strategy = new SerialConvolutionStrategy<TInput, TOutput>();
+    convolution_strategy = new ParallelConvolutionStrategy<TInput, TOutput>();
 }
 
 template <typename TInput, typename TOutput>

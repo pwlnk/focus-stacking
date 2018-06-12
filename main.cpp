@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 
 #include "src/images_utils.h"
 #include "src/focus_stack.h"
@@ -13,14 +14,13 @@ int main(int argc, char* argv[]) {
     FocusStack focus_stack;
     images_utils::readImagesFromDirToFocusStack(images_dir, focus_stack);
 
-    std::clock_t start;
-    double duration;
-    start = std::clock();
+    auto start = std::chrono::steady_clock::now();
 
     focus_stack.computeAllInFocusAndDepthMap();
 
-    duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
-    std::cout << "processing time: " << duration << std::endl;
+    auto end = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration<double, std::milli>(end - start);
+    std::cout << "processing time: " << duration.count() << std::endl;
 
     Matrix<uint8_t> depth_map = focus_stack.getDepthMap();
     Matrix<uint8_t> all_in_focus_image = focus_stack.getAllInFocusImage();
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 
     images_utils::storeImageOnDisk("../../depth_map.jpg", depth_map);
     images_utils::storeImageOnDisk("../../focus_image.jpg", all_in_focus_image);
-    
+
     cv::waitKey(0);
 
     return 0;
