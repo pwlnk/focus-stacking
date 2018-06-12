@@ -8,7 +8,7 @@ class LaplacianKernel : public FilterKernel {
         std::vector<float> kernel_values;
 
     public:
-        LaplacianKernel();
+        LaplacianKernel(unsigned short kernel_size = 7);
         ~LaplacianKernel();
 
         std::vector<float> getValues();

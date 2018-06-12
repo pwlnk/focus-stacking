@@ -7,8 +7,8 @@
 GaussianKernel::GaussianKernel(unsigned short kernel_size, float sigma) :
 ksize(kernel_size), sigma(sigma)
 {
-    generate2DKernel(ksize, sigma);
-    generate1DKernel(ksize, sigma);
+    generate2DKernel(kernel_size, sigma);
+    generate1DKernel(kernel_size, sigma);
 }
 
 void GaussianKernel::generate2DKernel(float kernel_size, float sigma) {
