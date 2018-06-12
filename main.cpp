@@ -13,6 +13,11 @@
 #include "src/gaussian_kernel.h"
 #include "src/laplacian_kernel.h"
 
+#include "src/focus_stack.h"
+
+#include <algorithm>
+#include <functional>
+
 // TODO: extract to separate utils class
 Matrix<uint8_t> cvMat2Matrix(cv::Mat& opencv_matrix);
 cv::Mat matrix2CvMat(Matrix<uint8_t>& matrix);
@@ -22,8 +27,6 @@ int main(int argc, char* argv[]) {
 
     const char* DEFAULT_IMG_DIR = "input/";
     const char* img_dir;
-
-    std::vector<Matrix<uint8_t>> images;
 
     if (argc == 2) {
         img_dir = argv[1];
@@ -35,59 +38,23 @@ int main(int argc, char* argv[]) {
     cv::glob(cv::String(img_dir), filenames);
     std::sort(filenames.begin(), filenames.end());
 
+    FocusStack focusStack;
     for (auto filename : filenames) {
         cv::Mat image = cv::imread(filename, CV_LOAD_IMAGE_COLOR);
         std::cout << "reading image: " << filename << std::endl;
-        images.push_back(cvMat2Matrix(image));
+        focusStack.addImage(cvMat2Matrix(image));
     }
 
-    std::vector<Matrix<float>> laplacian_images;
+    std::clock_t start;
+    double duration;
+    start = std::clock();
 
-    for (auto image : images) {
-        std::cout << "processing image" << std::endl;
-        Matrix<uint8_t> grayscale_image = GrayscaleConverter::convertToGrayscale(image);
+    focusStack.computeAllInFocusAndDepthMap();
+    Matrix<uint8_t> depth_map = focusStack.getDepthMap();
+    Matrix<uint8_t> all_in_focus_image = focusStack.getAllInFocusImage();
 
-        GaussianKernel gaussian_kernel;
-        ImageFilter<uint8_t, uint8_t> gaussian_filter(gaussian_kernel);
-        Matrix<uint8_t> blurred_image = gaussian_filter.convolution(grayscale_image);
-
-        LaplacianKernel laplacian_kernel;
-        ImageFilter<uint8_t, float> laplacian_filter(laplacian_kernel);
-        Matrix<float> laplacian_image = laplacian_filter.convolution(blurred_image);
-
-        laplacian_images.push_back(laplacian_image);
-    }
-
-    Shape images_shape = laplacian_images[0].getShape();
-    Matrix<uint8_t> depth_map(images_shape);
-    Matrix<uint8_t> all_in_focus_image(images_shape.x, images_shape.y, 3);
-    for (int row = 0; row < images_shape.y; row++) {
-        for (int col = 0; col < images_shape.x; col++) {
-            int max_idx = laplacian_images.size();
-            float max_image_value = 0;
-            const int THRESHOLD = 70;
-
-            for (int image_idx = 0; image_idx < laplacian_images.size(); image_idx++) {
-                if (abs(laplacian_images.at(image_idx).at(col, row, 0)) > max_image_value &&
-                    abs(laplacian_images.at(image_idx).at(col, row, 0)) > THRESHOLD) {
-                    max_idx = image_idx + 1;
-                    max_image_value = abs(laplacian_images.at(image_idx).at(col, row, 0));
-                }
-            }
-
-            depth_map.at(col, row, 0) = 255 - max_idx * (255 / (laplacian_images.size() + 1));
-            if (max_idx != 0) {
-                all_in_focus_image.at(col, row, 0) = images.at(max_idx - 1).at(col, row, 0);
-                all_in_focus_image.at(col, row, 1) = images.at(max_idx - 1).at(col, row, 1);
-                all_in_focus_image.at(col, row, 2) = images.at(max_idx - 1).at(col, row, 2);
-            }
-            else {
-                all_in_focus_image.at(col, row, 0) = images.at(laplacian_images.size() - 1).at(col, row, 0);
-                all_in_focus_image.at(col, row, 1) = images.at(laplacian_images.size() - 1).at(col, row, 1);
-                all_in_focus_image.at(col, row, 2) = images.at(laplacian_images.size() - 1).at(col, row, 2);
-            }
-        }
-    }
+    duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
+    std::cout << "processing time: " << duration << std::endl;
 
     cv::Mat image = matrix2CvMat(depth_map);
     cv::namedWindow("Image", cv::WINDOW_AUTOSIZE);
