@@ -12,9 +12,12 @@ class ParallelConvolutionStrategy : public ConvolutionStrategy<TInput, TOutput> 
         FilterKernel* kernel;
 
         void threadConvolutionChunk2D(int start_row, int end_row);
+        void threadConvolutionChunk1D(int start_row, int end_row, int kernel_direction,
+                                      Matrix<TOutput>& after_first_pass_image);
 
         float convolution2DStep(int col, int row, int channel);
-        float convolution1DStep(int col, int row, int channel, int kernel_direction, Matrix<TOutput>& after_first_pass_image);
+        float convolution1DStep(int col, int row, int channel, int kernel_direction,
+                                Matrix<TOutput>& after_first_pass_image);
 
     public:
         void convolution2D(Matrix<TInput>& image, Matrix<TOutput>& filtered_image, FilterKernel& kernel);
@@ -85,18 +88,39 @@ void ParallelConvolutionStrategy<TInput, TOutput>::convolution1D(Matrix<TInput>&
     this->kernel = &kernel;
 
     Matrix<TOutput> after_first_pass_image(image.getShape());
+    int threads_number = 4;
 
     for (int kernel_direction = 0; kernel_direction < 2; kernel_direction++) {
-        for (int row = 0; row < image.getShape().y; row++) {
-            for (int col = 0; col < image.getShape().x; col++) {
-                for (int channel = 0; channel < image.getShape().z; channel++) {
-                    float convolution_step_value = convolution1DStep(col, row, channel, kernel_direction, after_first_pass_image);
-                    filtered_image.at(col, row, channel) = convolution_step_value;
+        std::vector<std::thread*> threads;
 
-                    // TODO: get rid of magic number
-                    if (kernel_direction == 0) {
-                        after_first_pass_image.at(col, row, channel) = convolution_step_value;
-                    }
+        for (int thread_idx = 0; thread_idx < threads_number; thread_idx++) {
+            int rows_per_thread = static_cast<int>(image.getShape().y / threads_number);
+            int start_row = thread_idx * rows_per_thread;
+            int end_row = thread_idx != threads_number - 1 ? start_row + rows_per_thread : image.getShape().y;
+
+            threads.push_back(new std::thread([this, start_row, end_row, kernel_direction, &after_first_pass_image]
+                                              { this->threadConvolutionChunk1D(start_row, end_row, kernel_direction, after_first_pass_image); }));
+        }
+
+
+        for (auto convolution_thread : threads) {
+            convolution_thread->join();
+            delete convolution_thread;
+        }
+    }
+}
+
+template <typename TInput, typename TOutput>
+void ParallelConvolutionStrategy<TInput, TOutput>::threadConvolutionChunk1D(int start_row, int end_row, int kernel_direction, Matrix<TOutput>& after_first_pass_image) {
+    for (int row = start_row; row < end_row; row++) {
+        for (int col = 0; col < image->getShape().x; col++) {
+            for (int channel = 0; channel < image->getShape().z; channel++) {
+                float convolution_step_value = convolution1DStep(col, row, channel, kernel_direction, after_first_pass_image);
+                filtered_image->at(col, row, channel) = convolution_step_value;
+
+                // TODO: get rid of magic number
+                if (kernel_direction == 0) {
+                    after_first_pass_image.at(col, row, channel) = convolution_step_value;
                 }
             }
         }
