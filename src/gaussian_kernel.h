@@ -4,10 +4,7 @@
 
 class GaussianKernel : public FilterKernel {
     private:
-        unsigned short ksize;
         float sigma;
-
-        std::vector<float> kernel_values;
         std::vector<float> kernel_values_1D;
 
         float gaussianPDFSample2D(float x, float y, float sigma, float amplitude = 1.0f);
@@ -21,9 +18,6 @@ class GaussianKernel : public FilterKernel {
         GaussianKernel(unsigned short kernel_size = 7, float sigma = 5.0f);
         ~GaussianKernel();
 
-        std::vector<float> getValues();
-        unsigned short getSize();
-        float at(int col, int row);
         float at1D(int idx);
         bool isSeparableInto1D();
 };

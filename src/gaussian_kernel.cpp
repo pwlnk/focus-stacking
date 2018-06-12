@@ -5,8 +5,9 @@
 #include <algorithm>
 
 GaussianKernel::GaussianKernel(unsigned short kernel_size, float sigma) :
-ksize(kernel_size), sigma(sigma)
+sigma(sigma)
 {
+    ksize = kernel_size;
     generate2DKernel(kernel_size, sigma);
     generate1DKernel(kernel_size, sigma);
 }
@@ -56,18 +57,6 @@ void GaussianKernel::normalizeKernel(std::vector<float>& kernel) {
     std::transform(kernel.begin(), kernel.end(), kernel.begin(),
                    [kernel_sum](float kernel_value) -> float { return kernel_value / kernel_sum; });
 
-}
-
-std::vector<float> GaussianKernel::getValues() {
-    return kernel_values;
-}
-
-unsigned short GaussianKernel::getSize() {
-    return ksize;
-}
-
-float GaussianKernel::at(int col, int row) {
-    return kernel_values.at(row * ksize + col);
 }
 
 float GaussianKernel::at1D(int idx) {

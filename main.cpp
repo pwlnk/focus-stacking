@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 
     images_utils::storeImageOnDisk("../../depth_map.jpg", depth_map);
     images_utils::storeImageOnDisk("../../focus_image.jpg", all_in_focus_image);
-
+    
     cv::waitKey(0);
 
     return 0;
