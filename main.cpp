@@ -2,6 +2,7 @@
 
 #include "src/images_utils.h"
 #include "src/focus_stack.h"
+#include "src/gaussian_kernel.h"
 
 std::string getImagesDir(int argc, char* argv[], std::string default_images_dir);
 
@@ -23,7 +24,7 @@ int main(int argc, char* argv[]) {
 
     Matrix<uint8_t> depth_map = focus_stack.getDepthMap();
     Matrix<uint8_t> all_in_focus_image = focus_stack.getAllInFocusImage();
-    
+
     images_utils::showImage("Depth Map", depth_map);
     images_utils::showImage("All in Focus Image", all_in_focus_image);
 
@@ -36,9 +37,9 @@ int main(int argc, char* argv[]) {
 }
 
 std::string getImagesDir(int argc, char* argv[], std::string default_images_dir) {
-    if (argc == 2) { 
+    if (argc == 2) {
         return std::string(argv[1]);
     }
-    
+
     return default_images_dir;
 }
