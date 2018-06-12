@@ -63,20 +63,29 @@ int main(int argc, char* argv[]) {
     Matrix<uint8_t> all_in_focus_image(images_shape.x, images_shape.y, 3);
     for (int row = 0; row < images_shape.y; row++) {
         for (int col = 0; col < images_shape.x; col++) {
-            int max_idx = 0;
+            int max_idx = laplacian_images.size();
             float max_image_value = 0;
+            const int THRESHOLD = 70;
 
             for (int image_idx = 0; image_idx < laplacian_images.size(); image_idx++) {
-                if (abs(laplacian_images.at(image_idx).at(col, row, 0)) > max_image_value) {
-                    max_idx = image_idx;
+                if (abs(laplacian_images.at(image_idx).at(col, row, 0)) > max_image_value &&
+                    abs(laplacian_images.at(image_idx).at(col, row, 0)) > THRESHOLD) {
+                    max_idx = image_idx + 1;
                     max_image_value = abs(laplacian_images.at(image_idx).at(col, row, 0));
                 }
             }
 
-            depth_map.at(col, row, 0) = max_idx * (255 / laplacian_images.size());
-            all_in_focus_image.at(col, row, 0) = images.at(max_idx).at(col, row, 0);
-            all_in_focus_image.at(col, row, 1) = images.at(max_idx).at(col, row, 1);
-            all_in_focus_image.at(col, row, 2) = images.at(max_idx).at(col, row, 2);
+            depth_map.at(col, row, 0) = 255 - max_idx * (255 / (laplacian_images.size() + 1));
+            if (max_idx != 0) {
+                all_in_focus_image.at(col, row, 0) = images.at(max_idx - 1).at(col, row, 0);
+                all_in_focus_image.at(col, row, 1) = images.at(max_idx - 1).at(col, row, 1);
+                all_in_focus_image.at(col, row, 2) = images.at(max_idx - 1).at(col, row, 2);
+            }
+            else {
+                all_in_focus_image.at(col, row, 0) = images.at(laplacian_images.size() - 1).at(col, row, 0);
+                all_in_focus_image.at(col, row, 1) = images.at(laplacian_images.size() - 1).at(col, row, 1);
+                all_in_focus_image.at(col, row, 2) = images.at(laplacian_images.size() - 1).at(col, row, 2);
+            }
         }
     }
 
