@@ -29,7 +29,7 @@ void FocusStack::computeLaplacianOfGaussianStack(std::vector<Matrix<float>>& log
     ImageFilter<uint8_t, float> laplacian_filter(laplacian_kernel);
 
     int image_number = 1;
-    for (auto image : images_stack) {
+    for (auto& image : images_stack) {
         // TODO: remove this cout
         std::cout << "processing image " << image_number++ << "/" << images_stack.size() << std::endl;
 
@@ -62,11 +62,11 @@ int FocusStack::maxLoGIdx(int col, int row, std::vector<Matrix<float>> &log_stac
     float max_laplacian_value = 0;
 
     for (int stack_idx = 0; stack_idx < log_stack.size(); stack_idx++) {
-        if (abs(log_stack.at(stack_idx).at(col, row, 0)) > max_laplacian_value &&
-            abs(log_stack.at(stack_idx).at(col, row, 0)) > bg_threshold)
+        if (std::abs(log_stack.at(stack_idx).at(col, row, 0)) > max_laplacian_value &&
+            std::abs(log_stack.at(stack_idx).at(col, row, 0)) > bg_threshold)
         {
             max_laplacian_idx = stack_idx;
-            max_laplacian_value = abs(log_stack.at(stack_idx).at(col, row, 0));
+            max_laplacian_value = std::abs(log_stack.at(stack_idx).at(col, row, 0));
         }
     }
 

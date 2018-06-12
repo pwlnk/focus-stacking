@@ -1,6 +1,6 @@
 #include "gaussian_kernel.h"
 
-#include <math.h>
+#include <cmath>
 #include <numeric>
 #include <algorithm>
 
@@ -12,7 +12,7 @@ sigma(sigma)
     generate1DKernel(kernel_size, sigma);
 }
 
-void GaussianKernel::generate2DKernel(float kernel_size, float sigma) {
+void GaussianKernel::generate2DKernel(unsigned short kernel_size, float sigma) {
     int kernel_reach = (kernel_size - 1) / 2;
     kernel_values.resize(kernel_size * kernel_size);
 
@@ -25,7 +25,7 @@ void GaussianKernel::generate2DKernel(float kernel_size, float sigma) {
     normalizeKernel(kernel_values);
 }
 
-void GaussianKernel::generate1DKernel(float kernel_size, float sigma) {
+void GaussianKernel::generate1DKernel(unsigned short kernel_size, float sigma) {
     int kernel_reach = (ksize - 1) / 2;
     kernel_values_1D.resize(ksize);
 
@@ -35,9 +35,6 @@ void GaussianKernel::generate1DKernel(float kernel_size, float sigma) {
 
     normalizeKernel(kernel_values_1D);
 }
-
-GaussianKernel::~GaussianKernel()
-{ }
 
 // TODO: point samples are not 100% accurate, these samples should be integrals over whole pixel
 float GaussianKernel::gaussianPDFSample2D(float x, float y, float sigma, float amplitude) {
