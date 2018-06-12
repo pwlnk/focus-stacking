@@ -7,6 +7,8 @@
 template <typename TInput, typename TOutput>
 class ParallelConvolutionStrategy : public ConvolutionStrategy<TInput, TOutput> {
     private:
+        int threads_number;
+
         Matrix<TInput>* image;
         Matrix<TOutput>* filtered_image;
         FilterKernel* kernel;
@@ -20,9 +22,16 @@ class ParallelConvolutionStrategy : public ConvolutionStrategy<TInput, TOutput> 
                                 Matrix<TOutput>& after_first_pass_image);
 
     public:
+        ParallelConvolutionStrategy(int threads_number = 4);
+
         void convolution2D(Matrix<TInput>& image, Matrix<TOutput>& filtered_image, FilterKernel& kernel);
         void convolution1D(Matrix<TInput>& image, Matrix<TOutput>& filtered_image, FilterKernel& kernel);
 };
+
+template <typename TInput, typename TOutput>
+ParallelConvolutionStrategy<TInput, TOutput>::ParallelConvolutionStrategy(int threads_number) :
+threads_number(threads_number)
+{ }
 
 template <typename TInput, typename TOutput>
 void ParallelConvolutionStrategy<TInput, TOutput>::convolution2D(Matrix<TInput>& image, Matrix<TOutput>& filtered_image, FilterKernel& kernel) {
@@ -30,7 +39,6 @@ void ParallelConvolutionStrategy<TInput, TOutput>::convolution2D(Matrix<TInput>&
     this->filtered_image = &filtered_image;
     this->kernel = &kernel;
 
-    int threads_number = 4;
     std::vector<std::thread*> threads;
 
     for (int thread_idx = 0; thread_idx < threads_number; thread_idx++) {
@@ -88,7 +96,6 @@ void ParallelConvolutionStrategy<TInput, TOutput>::convolution1D(Matrix<TInput>&
     this->kernel = &kernel;
 
     Matrix<TOutput> after_first_pass_image(image.getShape());
-    int threads_number = 4;
 
     for (int kernel_direction = 0; kernel_direction < 2; kernel_direction++) {
         std::vector<std::thread*> threads;
