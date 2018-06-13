@@ -1,13 +1,21 @@
 #include "images_utils.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdexcept>
+
 namespace images_utils {
 
     void readImagesFromDirToFocusStack(std::string images_dir_path, FocusStack &focus_stack) {
+        if (!dirExists(images_dir_path)) {
+            throw std::invalid_argument("directory does not exist");
+        }
+
         std::vector<cv::String> filenames;
         cv::glob(cv::String(images_dir_path), filenames);
         std::sort(filenames.begin(), filenames.end());
 
-        for (auto filename : filenames) {
+        for (auto& filename : filenames) {
             cv::Mat image = cv::imread(filename, CV_LOAD_IMAGE_COLOR);
             std::cout << "reading image: " << filename << std::endl;
             focus_stack.addImage(cvMat2Matrix(image));
@@ -71,6 +79,11 @@ namespace images_utils {
 
     short channelBGR2RGB(short BGR_channel, short channels_num) {
         return channels_num - BGR_channel - 1;
+    }
+
+    bool dirExists(std::string dir_path) {
+        struct stat dir_info;
+        return stat(dir_path.c_str(), &dir_info) == 0 && S_ISDIR(dir_info.st_mode);
     }
 
 }
