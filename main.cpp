@@ -7,7 +7,7 @@
 #include "src/focus_stack.h"
 
 struct Params {
-    std::string images_dir{"input/"};
+    std::string images_dir{"../example-images/"};
     int bg_threshold{70};
     unsigned short kernels_size{7};
     float gaussian_sigma{5.0f};
