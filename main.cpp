@@ -39,8 +39,8 @@ int main(int argc, char* argv[]) {
     Matrix<uint8_t> depth_map = focus_stack.getDepthMap();
     Matrix<uint8_t> all_in_focus_image = focus_stack.getAllInFocusImage();
 
-    images_utils::storeImageOnDisk("../../depth_map.jpg", depth_map);
-    images_utils::storeImageOnDisk("../../focus_image.jpg", all_in_focus_image);
+    images_utils::storeImageOnDisk("depth_map.jpg", depth_map);
+    images_utils::storeImageOnDisk("focus_image.jpg", all_in_focus_image);
 
     return 0;
 }
