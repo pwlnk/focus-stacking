@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 
     auto start = std::chrono::steady_clock::now();
 
-    focus_stack.computeAllInFocusAndDepthMap();
+    focus_stack.computeAllInFocusAndDepthMap(5, 3.0f, 50);
 
     auto end = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration<double, std::milli>(end - start);

@@ -15,7 +15,7 @@ class GaussianKernel : public FilterKernel {
         void generate1DKernel(unsigned short kernel_size, float sigma);
 
     public:
-        explicit  GaussianKernel(unsigned short kernel_size = 7, float sigma = 5.0f);
+        explicit GaussianKernel(unsigned short kernel_size = 7, float sigma = 5.0f);
         ~GaussianKernel() override = default;
 
         float at1D(int idx) override;

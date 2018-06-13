@@ -12,19 +12,20 @@ void FocusStack::addImage(Matrix<uint8_t> image) {
     images_stack.push_back(image);
 }
 
-void FocusStack::computeAllInFocusAndDepthMap(const int bg_threshold) {
+void FocusStack::computeAllInFocusAndDepthMap(unsigned short kernels_size, float gaussian_sigma, const int bg_threshold) {
     Shape images_shape = images_stack[0].getShape();
     depth_map = Matrix<uint8_t>(images_shape.x, images_shape.y);
     all_in_focus_image = Matrix<uint8_t>(images_shape);
 
     std::vector<Matrix<float>> log_stack;
-    computeLaplacianOfGaussianStack(log_stack);
+    computeLaplacianOfGaussianStack(log_stack, kernels_size, gaussian_sigma);
     computeAllInFocusAndDepthMap(log_stack, bg_threshold);
 }
 
-void FocusStack::computeLaplacianOfGaussianStack(std::vector<Matrix<float>>& log_stack) {
-    GaussianKernel gaussian_kernel;
-    LaplacianKernel laplacian_kernel;
+void FocusStack::computeLaplacianOfGaussianStack(std::vector<Matrix<float>> &log_stack, unsigned short kernels_size,
+                                                 float gaussian_sigma) {
+    GaussianKernel gaussian_kernel(kernels_size, gaussian_sigma);
+    LaplacianKernel laplacian_kernel(kernels_size);
     ImageFilter<uint8_t, uint8_t> gaussian_filter(gaussian_kernel);
     ImageFilter<uint8_t, float> laplacian_filter(laplacian_kernel);
 
