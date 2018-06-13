@@ -73,3 +73,9 @@ are meaningful or whether they belong to image background (default=70)
 |![all-in-focus](http://luniak.io/focus-stacking-repo-images/focus_image_70_7_5.jpg)|![depth-map](http://luniak.io/focus-stacking-repo-images/depth_map_70_7_5.jpg)|
 |`bg_threshold=160`, `kernels_size=13`, `gaussian_sigma=7.0`||
 |![all-in-focus](http://luniak.io/focus-stacking-repo-images/focus_image_160_13_7.jpg)|![depth-map](http://luniak.io/focus-stacking-repo-images/depth_map_160_13_7.jpg)|
+
+### Bonus
+
+Animated image generated with [depthy.me](http://depthy.me/) tool.
+
+![all-in-focus](http://luniak.io/focus-stacking-repo-images/animated_bug.gif)
