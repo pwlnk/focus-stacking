@@ -14,12 +14,11 @@ To run this project **OpenCV 3** is required (used for images disk operations).
 
 **Building:**
 
-In order to build this program, follow below steps:
+In order to build this program, please download and extract this repository and then 
+follow below steps:
 
 ```bash
-git clone git@github.com:gooeyone/focus-stacking.git
 cd focus-stacking
-
 mkdir build
 cd build
 
