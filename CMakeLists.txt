@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(focusStacking)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O3")
 
 add_subdirectory(googletest)
 
@@ -20,7 +19,7 @@ file(GLOB TEST_SOURCES "test/.h" "test/*.cpp")
 add_executable(focusStacking main.cpp ${SOURCES})
 add_executable(runAllTests tests.cpp ${TEST_SOURCES} ${SOURCES})
 
-target_link_libraries(focusStacking ${OpenCV_LIBS})
+target_link_libraries(focusStacking ${OpenCV_LIBS} pthread)
 target_link_libraries(runAllTests ${OpenCV_LIBS} gtest gtest_main gmock gmock_main)
 
 add_test(AllTests runAllTests)
