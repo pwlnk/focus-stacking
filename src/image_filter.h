@@ -16,6 +16,7 @@ class ImageFilter {
 
     public:
         ImageFilter(FilterKernel& kernel);
+        ~ImageFilter();
 
         Matrix<TOutput> convolution(Matrix<TInput>& image);
 };
@@ -27,6 +28,11 @@ kernel(kernel)
 //    convolution_strategy = new SerialConvolutionStrategy<TInput, TOutput>();
     convolution_strategy = new ParallelConvolutionStrategy<TInput, TOutput>();
 }
+
+template <typename TInput, typename TOutput>
+ImageFilter<TInput, TOutput>::~ImageFilter() {
+    delete convolution_strategy;
+};
 
 template <typename TInput, typename TOutput>
 Matrix<TOutput> ImageFilter<TInput, TOutput>::convolution(Matrix<TInput>& image) {
