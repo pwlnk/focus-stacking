@@ -5,9 +5,13 @@ which is used in digital image processing. It combines multiple images taken at 
 focus distances to give a resulting image with a greated _depth of field_ than any
 of the individual source images. [[Wikipedia]](https://en.wikipedia.org/wiki/Focus_stacking)
 
+_Images in `example-images` directory comes from [http://grail.cs.washington.edu/projects/photomontage/data/bug.zip](http://grail.cs.washington.edu/projects/photomontage/data/bug.zip)._
+
 ## Requirements and Technical Info
 
 To run this project **OpenCV 3** is required (used for images disk operations).
+
+Project was compiled and tested under _Manjaro Linux 17.1.10_ (_kernel 4.14.47_).
 
 
 ## Build and Run Instruction
