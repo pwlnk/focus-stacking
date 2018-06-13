@@ -41,6 +41,12 @@ In order to run focus stacking, execute (all arguments are optional):
 ```bash
 ./focusStacking [images_directory [bg_threshold [kernels_size [gaussian_sigma]]]]
 ```
+
+Example:
+```bash
+./focusStacking ../example-images/ 70 7 5.0
+```
+
 After processing results are stored in the same director as executable. Results are two JPG images, 
 i.e. `focus_image.jpg` and `depth_map.jpg`. 
 
